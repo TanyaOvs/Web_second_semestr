@@ -1,0 +1,22 @@
+body{
+    background-color: black;
+}
+
+body h2{
+    text-align: center;
+    color: #2d0444;
+}
+
+.form{
+    display: flex;
+    /*background-color: pink;*/
+    flex-direction: column;
+    margin: 40px 40%;
+}
+
+.form ol li{
+    color: #2d0444;
+}
+.form ol {
+    color: #2d0444;
+}
