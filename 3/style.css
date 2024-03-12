@@ -1,5 +1,19 @@
+.main_header{
+    width: 100%;
+    background-color:#68006C;
+}
+.header_name{
+    color:azure;
+    font: small-caps bold 1.2rem sans-serif;
+    font-size: 36px;
+}
+
+#kitty_id{
+    margin-left: 10px;
+}
+
 body{
-    background-color: black;
+    background-color: #F7C9F7!important;
 }
 
 body h2{
@@ -9,9 +23,11 @@ body h2{
 
 .form{
     display: flex;
-    /*background-color: pink;*/
     flex-direction: column;
-    margin: 40px 40%;
+    align-items: center;
+    margin: 40px 30%;
+    border: 10px groove #68006C;
+    background: #FDE8FD;
 }
 
 .form ol li{
