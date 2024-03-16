@@ -1,105 +1,71 @@
-<!doctype html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="style.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <title>Третье задание</title>
-</head>
-<body>
-<div class="row justify-content-md-between">
-    <div class="main_header d-flex align-items-center">
-        <img id="kitty_id" src="kitty.png" alt="Логотип сайта с котиком" class="mr-4">
-        <h1 class="header_name">Третье задание</h1>
-    </div>
-</div>
-<!-- Форма -->
-<div class="form">
-    <h2>Форма</h2>
-    <form action="/" method="POST">
-        <ol>
-            <li>
-                <label>
-                    ФИО:<br />
-                    <input name="FIO"
-                           type="text"
-                           placeholder="Иванов Иван Иванович" />
-                </label><br />
-            </li>
+<?php
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $user = 'u67310';
+    $pass = '8200920';
+    $db = new PDO('mysql:host=localhost;dbname=u67310', $user, $pass);
 
-            <li>
-                <label>
-                    Телефон:<br />
-                    <input name="phone"
-                           type="tel"
-                           placeholder="Введите номер телефона" />
-                </label><br />
-            </li>
+    //Данные из формы
+    $name = $_POST['FIO'];
+    $phone = $_POST['phone'];
+    $email = $_POST['email'];
+    $birthdate = $_POST['birthdate'];
+    $gender = isset($_POST['gender']) ? $_POST['gender'] : '';
+    $bio = $_POST['bio'];
+    $check = isset($_POST['check']) ? 1 : 0;
 
-            <li>
-                <label>
-                    E-mail:<br />
-                    <input name="email"
-                           type="email"
-                           placeholder="Введите вашу почту" />
-                </label><br />
-            </li>
+    // Проверка корректности заполнения полей
+	echo "<div class='error-message-container'>";
+    $errors = [];
 
-            <li>
-                <label>
-                    Дата рождения:<br />
-                    <input name="date"
-                           value="2023-09-01"
-                           type="date"/>
-                </label><br />
-            </li>
+    if (!preg_match("/^[a-zA-Zа-яА-Я ]+$/u", $name)) {
+        $errors[] = "Пожалуйста, введите корректное имя.";
+    }
 
-            <li>
-                Пол: <br />
-                <label class="gender"><input type="radio"
-                                             name="gender" value="female" />
-                    Женский</label>
-                <label class="gender"><input type="radio"
-                                             name="gender" value="male" />
-                    Мужской</label><br />
-            </li>
+    if (!preg_match("/^\+?[0-9]{1,4}[0-9]{10}$/", $phone)) {
+        $errors[] = "Пожалуйста, введите корректный номер телефона";
+    }
 
-            <li>
-                <label>
-                    Любимый язык программирования: <br />
-                    <select name="language" multiple="multiple">
-                        <option value="Pascal">Pascal</option>
-                        <option value="C">C</option>
-                        <option value="C++">C++</option>
-                        <option value="JavaScript">JavaScript</option>
-                        <option value="PHP">PHP</option>
-                        <option value="Python">Python</option>
-                        <option value="Java">Java</option>
-                        <option value="Haskell">Haskell</option>
-                        <option value="Clojure">Clojure</option>
-                        <option value="Prolog">Prolog</option>
-                        <option value="Scala">Scala</option>
-                    </select>
-                </label><br />
-            </li>
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "Введите корректный email.";
+    }
 
-            <li>
-                <label>
-                    Биография: <br />
-                    <textarea name="bio" placeholder="Напишите о себе"></textarea>
-                </label><br />
-            </li>
+    $birthdateObj = DateTime::createFromFormat('Y-m-d', $birthdate);
+    if (!$birthdateObj || $birthdateObj->format('Y-m-d') !== $birthdate) {
+        $errors[] = "Дата рождения должна быть в формате ГОД-МЕСЯЦ-ДЕНЬ (например, 2000-01-31)!";
+    }
 
-            <li>
-                Соглашение: <br />
-                <label class="sogl"><input type="checkbox" name="check" required/>
-                    C контрактом ознакомлен(а)</label><br />
-            </li>
+    if (empty($gender)) {
+        $errors[] = "Пожалуйста, выберите пол.";
+    }
 
-            <li><input type="submit" value="Сохранить" /></li>
-        </ol>
-    </form>
-</div>
-</body>
-</html>
+    if (!preg_match("/^[a-zA-Zа-яА-Я.,! ]+$/u", $bio)) {
+        $errors[] = "Поле Биография не может содержать специальные символы!";
+    }
+
+    if (!empty($errors)) {
+        foreach ($errors as $error) {
+            echo "<div error-message style='margin-top: 10px;font: small-caps 1.2rem sans-serif;font-size: 36px;text-align: center;color: #68006C;background: #FDE8FD;'>$error</div>";
+        }
+    }
+    else {
+        $stmt = $db->prepare("INSERT INTO Applications (FIO, Phone, Email, Birthdate, Gender, Contract, Bio) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        if($stmt->execute([$name, $phone, $email, $birthdate, $gender, $check, $bio])){
+            $last_id = $db->lastInsertId();
+            foreach ($_POST['language'] as $language) {
+                $stmt = $db->prepare("SELECT ID FROM Programming_Languages WHERE ProgrammingLanguage = ?");
+                $stmt->execute([$language]);
+                $programming_language_id = $stmt->fetchColumn();
+
+                $stmt = $db->prepare("INSERT INTO Application_Ability (ApplicationID, ProgrammingLanguageID) VALUES (?, ?)");
+                $stmt->execute([$last_id, $programming_language_id]);
+                }
+        header('Location: form.php?actionsCompleted=1');
+        exit();
+        }
+        else {
+            echo "<div class='error-message' style='color: red;'>Ошибка при вставке данных в базу.</div>";
+        }
+    }
+}
+include('form.php');
+?>
