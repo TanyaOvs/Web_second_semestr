@@ -13,6 +13,7 @@
 }
 
 body{
+    overflow: hidden;
     background-color: #F7C9F7!important;
 }
 
@@ -25,7 +26,7 @@ body h2{
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 40px 30%;
+    margin: 20px 36%;
     border: 10px groove #68006C;
     background: #FDE8FD;
 }
@@ -35,4 +36,24 @@ body h2{
 }
 .form ol {
     color: #2d0444;
+}
+
+.success-message {
+    display: none;
+    margin-top: 10px;
+    font: small-caps 1.2rem sans-serif;
+    font-size: 36px;
+    text-align: center;
+    color: #68006C;
+    background: #FDE8FD;
+}
+
+.error-message{
+    display: none;
+    margin-top: 10px;
+    font: small-caps 1.2rem sans-serif;
+    font-size: 36px;
+    text-align: center;
+    color: #68006C;
+    background: #FDE8FD;
 }
