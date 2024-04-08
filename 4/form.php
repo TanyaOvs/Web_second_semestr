@@ -17,7 +17,9 @@
 </div>
 <!-- Форма -->
 <?php
+$errorsExist = FALSE;
 if (!empty($messages)) {
+  $errorsExist = TRUE;
   print('<div class="error-messages">');
   foreach ($messages as $message) {
     print($message);
@@ -35,28 +37,28 @@ if(isset($_GET['actionsCompleted']) && $_GET['actionsCompleted'] == '1') {
         <ol>
             <li>
                 <label>
-                    ФИО:<br /> <input name="fio" <?php if (isset($errors['fio'])) {print 'class="error" value="' . $values['fio'] . '"';}?>
+                    ФИО:<br /> <input name="fio" <?php if (isset($errors['fio']) && $errors['fio'] != '') {print 'class="error"';} ?> value="<?php if(isset($values['fio'])) {print $values['fio'];} ?>"
                     type="text" placeholder="Иванов Иван Иванович" />
                 </label><br />
             </li>
 
             <li>
                 <label>
-                    Телефон:<br /><input name="phone" <?php if (isset($errors['phone'])) {print 'class="error" value="' . $values['phone'] . '"';}?>
+                    Телефон:<br /><input name="phone" <?php if (isset($errors['phone']) && $errors['phone'] != '') {print 'class="error"';} ?> value="<?php if(isset($values['phone'])) {print $values['phone'];} ?>"
                     type="tel" placeholder="Введите номер телефона" />
                 </label><br />
             </li>
 
             <li>
                 <label>
-                    E-mail:<br /><input name="email" <?php if (isset($errors['email'])) {print 'class="error" value="' . $values['email'] . '"';}?>
+                    E-mail:<br /><input name="email" <?php if (isset($errors['email']) && $errors['email'] != '') {print 'class="error"';} ?> value="<?php if(isset($values['email'])) {print $values['email'];} ?>"
                     type="email" placeholder="Введите вашу почту" />
                 </label><br />
             </li>
 
             <li>
                 <label>
-                    Дата рождения:<br /><input name="birthdate" <?php if (isset($errors['birthdate'])) {print 'class="error" value="' . $values['birthdate'] . '"';}?>
+                    Дата рождения:<br /><input name="birthdate" <?php if (isset($errors['birthdate']) && $errors['birthdate'] != '') {print 'class="error"';} ?> value="<?php print $values['birthdate']; ?>"
                     type="date" required/>
                 </label><br />
             </li>
@@ -90,13 +92,14 @@ if(isset($_GET['actionsCompleted']) && $_GET['actionsCompleted'] == '1') {
 
             <li>
                 <label>
-                    Биография: <br /><textarea name="bio" placeholder="Напишите о себе"></textarea>
+                    Биография: <br /><textarea name="bio" <?php if (isset($errors['bio']) && $errors['bio'] != '') {print 'class="error"';} ?>
+                    placeholder="Напишите о себе"> <?php if(isset($values['bio'])) {print $values['bio'];} ?> </textarea>
                 </label> <br />
             </li>
 
             <li>
                 Соглашение: <br />
-                <label class="sogl"><input type="checkbox" name="check" required/> C контрактом ознакомлен(а)</label><br />
+                <label><input type="checkbox" name="check" required <?php if ($errorsExist) {echo 'checked';} ?>/> C контрактом ознакомлен(а)</label><br />
             </li>
 
             <li><input type="submit" value="Сохранить" /></li>
