@@ -24,42 +24,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET'){
     //Выдаем сообщения об ошибках для каждого поля
     if ($errors['fio']) {
         setcookie('fio_error', '', time() - 3600); // Удаляем куку, указывая время устаревания в прошлом.
+        setcookie('fio_value', '', time() - 3600);
         $error = "Пожалуйста, введите корректное имя.";
         $messages[] = "<div class='error-messages'>$error</div>";
      }
 
      if ($errors['phone']) {
         setcookie('phone_error', '', time() - 3600);
+        setcookie('phone_value', '', time() - 3600);
         $error = "Пожалуйста, введите корректный номер телефона";
         $messages[] = "<div class='error-messages'>$error</div>";
      }
 
      if ($errors['email']) {
          setcookie('email_error', '', time() - 3600);
+         setcookie('email_value', '', time() - 3600);
          $error = "Введите корректный email.";
          $messages[] = "<div class='error-messages'>$error</div>";
       }
 
-     if ($errors['email']) {
-         setcookie('email_error', '', time() - 3600);
-         $error = "Введите корректный email.";
-         $messages[] = "<div class='error-messages'>$error</div>";
-     }
-
      if ($errors['birthdate']) {
          setcookie('birthdate_error', '', time() - 3600);
+         setcookie('birthdate_value', '', time() - 3600);
          $error = "Дата рождения должна быть в формате ДЕНЬ-МЕСЯЦ-ГОД (например, 15-03-2002)!";
          $messages[] = "<div class='error-messages'>$error</div>";
      }
 
      if ($errors['gender']) {
          setcookie('gender_error', '', time() - 3600);
+         setcookie('gender_value', '', time() - 3600);
          $error = "Пожалуйста, выберите пол.";
          $messages[] = "<div class='error-messages'>$error</div>";
      }
 
      if ($errors['bio']) {
          setcookie('bio_error', '', time() - 3600);
+         setcookie('bio_value', '', time() - 3600);
          $error = "Поле 'Биография' не может содержать специальные символы!";
          $messages[] = "<div class='error-messages'>$error</div>";
      }
@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET'){
     $values['phone'] = empty($_COOKIE['phone_value']) ? '' : $_COOKIE['phone_value'];
     $values['email'] = empty($_COOKIE['email_value']) ? '' : $_COOKIE['email_value'];
     $values['birthdate'] = empty($_COOKIE['birthdate_value']) ? '' : $_COOKIE['birthdate_value'];
-    //$values['gender'] = empty($_COOKIE['gender_value']) ? '' : $_COOKIE['gender_value']; Нужно ли сохранять это значение
+    $values['gender'] = empty($_COOKIE['gender_value']) ? '' : $_COOKIE['gender_value']; //Нужно ли сохранять это значение
     $values['bio'] = empty($_COOKIE['bio_value']) ? '' : $_COOKIE['bio_value'];
     $values['check'] = empty($_COOKIE['check_value']) ? '' : $_COOKIE['check_value'];
     /*********** Как обработать языки программирования? **************************************************************/
@@ -89,8 +89,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET'){
     include('form.php');
 }
 else {
-    $user = '*****';
-    $pass = '*****';
+    $user = '******';
+    $pass = '***';
     $db = new PDO('mysql:host=localhost;dbname=u67310', $user, $pass);
 
     //Данные из формы
@@ -110,51 +110,39 @@ else {
         setcookie('fio_error', '1', time() + 24 * 60 * 60);
         $errorsExist = TRUE;
     }
-    else {
-        // Сохраняем ранее введенное в форму значение на год
-        setcookie('fio_value', $name, time() + 360 * 24 * 60 * 60);
-    }
+    // Сохраняем ранее введенное в форму значение на год
+    setcookie('fio_value', $name, time() + 360 * 24 * 60 * 60);
 
     if (!preg_match("/^\+?[0-9]{1,4}[0-9]{10}$/", $phone)) {
         setcookie('phone_error', '1', time() + 24 * 60 * 60);
         $errorsExist = TRUE;
     }
-    else {
-        setcookie('phone_value', $phone, time() + 360 * 24 * 60 * 60);
-    }
+    setcookie('phone_value', $phone, time() + 360 * 24 * 60 * 60);
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         setcookie('email_error', '1', time() + 24 * 60 * 60);
         $errorsExist = TRUE;
     }
-    else {
-        setcookie('email_value', $email, time() + 360 * 24 * 60 * 60);
-    }
+    setcookie('email_value', $email, time() + 360 * 24 * 60 * 60);
 
     $birthdateObj = DateTime::createFromFormat('Y-m-d', $birthdate);
     if (!$birthdateObj || $birthdateObj->format('Y-m-d') !== $birthdate) {
         setcookie('birthdate_error', '1', time() + 24 * 60 * 60);
         $errorsExist = TRUE;
     }
-    else {
-        setcookie('birthdate_value', $birthdate, time() + 360 * 24 * 60 * 60);
-    }
+    setcookie('birthdate_value', $birthdate, time() + 360 * 24 * 60 * 60);
 
     if (empty($gender) || ($gender !== 'male' && $gender !== 'female')) {
         setcookie('gender_error', '1', time() + 24 * 60 * 60);
         $errorsExist = TRUE;
     }
-    /*else {
-        setcookie('gender_value', $gender, time() + 360 * 24 * 60 * 60);
-    }*/
+    setcookie('gender_value', $gender, time() + 360 * 24 * 60 * 60);
 
     if (!preg_match("/^[a-zA-Zа-яА-Я.,! ]*$/u", $bio)) {
         setcookie('bio_error', '1', time() + 24 * 60 * 60);
         $errorsExist = TRUE;
     }
-    else {
-        setcookie('bio_value', $bio, time() + 360 * 24 * 60 * 60);
-    }
+    setcookie('bio_value', $bio, time() + 360 * 24 * 60 * 60);
 
     if($check == 1){
         setcookie('check_value', $check, time() + 360 * 24 * 60 * 60);
