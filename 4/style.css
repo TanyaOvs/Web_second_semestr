@@ -12,8 +12,12 @@
     margin-left: 10px;
 }
 
+.row{
+    margin-right: 0px!important;
+}
+
 body{
-    overflow: hidden;
+    overflow-y: auto;
     background-color: #F7C9F7!important;
 }
 

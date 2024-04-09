@@ -64,17 +64,19 @@ if(isset($_GET['actionsCompleted']) && $_GET['actionsCompleted'] == '1') {
             </li>
 
             <li>
-                <label><input name="gender"
-                type="radio" value="female" /> Женский</label>
+                <div <?php if (isset($errors['gender']) && $errors['gender'] != '') {print 'class="error"';} ?> >
+                    <label > <input name="gender" type="radio" value="female"
+                    <?php if (isset($values['gender']) && $values['gender'] == 'female') {echo 'checked';} ?> /> Женский</label>
 
-                <label><input name="gender"
-                type="radio" value="male" /> Мужской</label><br />
+                    <label> <input name="gender" type="radio" value="male"
+                    <?php if (isset($values['gender']) && $values['gender'] == 'male') {echo 'checked';} ?> /> Мужской</label><br />
+                </div>
             </li>
 
             <li>
                 <label>
                     Любимый язык программирования: <br />
-                    <select name="language[]" multiple="multiple">
+                    <select name="language[]" multiple="multiple" <?php if ($errors['language_n'] == '1' || $errors['language_d'] == '1') {print 'class="error"';} ?>>
                     <?php
                     foreach ($valid_languages as $language) {
                       $selected = in_array($language, $values['languages']) ? 'selected' : '';
@@ -93,7 +95,8 @@ if(isset($_GET['actionsCompleted']) && $_GET['actionsCompleted'] == '1') {
 
             <li>
                 Соглашение: <br />
-                <label><input type="checkbox" name="check" required <?php if ($errorsExist) {echo 'checked';} ?>/> C контрактом ознакомлен(а)</label><br />
+                <label <?php if (isset($errors['check']) && $errors['check'] != '') {print 'class="error"';} ?> ><input type="checkbox" name="check" <?php if (isset($values['check']) && $values['check'] == 1) {echo 'checked';} ?>
+                /> C контрактом ознакомлен(а)</label><br /> <!-- $errorsExist && $errors['check'] == '' -->
             </li>
 
             <li><input type="submit" value="Сохранить" /></li>
