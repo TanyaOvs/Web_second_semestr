@@ -1,4 +1,7 @@
 <?php
+
+$valid_languages = array("Pascal", "C", "C++", "JavaScript", "PHP", "Python", "Java", "Haskell", "Clojure", "Prolog", "Scala");
+
 header('Content-Type: text/html; charset=UTF-8');
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET'){
@@ -84,13 +87,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET'){
     $values['gender'] = empty($_COOKIE['gender_value']) ? '' : $_COOKIE['gender_value']; //Нужно ли сохранять это значение
     $values['bio'] = empty($_COOKIE['bio_value']) ? '' : $_COOKIE['bio_value'];
     $values['check'] = empty($_COOKIE['check_value']) ? '' : $_COOKIE['check_value'];
+    $values['languages'] = empty($_COOKIE['languages']) ? array() : explode(",", $_COOKIE['languages']);
     /*********** Как обработать языки программирования? **************************************************************/
 
     include('form.php');
 }
 else {
-    $user = '******';
-    $pass = '***';
+    include('../db.php');
     $db = new PDO('mysql:host=localhost;dbname=u67310', $user, $pass);
 
     //Данные из формы
@@ -148,21 +151,25 @@ else {
         setcookie('check_value', $check, time() + 360 * 24 * 60 * 60);
     }
 
-
+    $selected_languages = '';
     if(empty($languages)){
         setcookie('language_null_error', '1', time() + 24 * 60 * 60);
         $errorsExist = TRUE;
     }
     else{
-        $valid_languages = array("Pascal", "C", "C++", "JavaScript", "PHP", "Python", "Java", "Haskell", "Clojure", "Prolog", "Scala");
         foreach ($languages as $p_language) {
             if (!in_array($p_language, $valid_languages)) {
                 setcookie('language_data_error', '1', time() + 24 * 60 * 60);
                 $errorsExist = TRUE;
                 break;
             }
+            if (!empty($selected_languages)) {
+              $selected_languages .= ',';
+            }
+            $selected_languages .= $p_language;
         }
     }
+    setcookie('languages', $selected_languages, time() + 360 * 24 * 60 * 60);
 
     if ($errorsExist) {
     // При наличии ошибок перезагружаем страницу и завершаем работу скрипта
