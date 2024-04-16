@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET'){
      if ($errors['bio']) {
          setcookie('bio_error', '', $timeToDeleteCookie);
          setcookie('bio_value', '', $timeToDeleteCookie);
-         $error = "Поле 'Биография' не может содержать специальные символы!";
+         $error = "'Биография' не может содержать специальные символы или только цифры!";
          $messages[] = "<div class='error-messages'>$error</div>";
      }
 
@@ -217,7 +217,7 @@ else {
             }
 
         setcookie('save', '1');
-        header('Location: form.php?actionsCompleted=1');
+        header('Location: index.php?actionsCompleted=1');
         exit();
         }
         else {
