@@ -59,18 +59,18 @@ if(isset($_GET['actionsCompleted']) && $_GET['actionsCompleted'] == '1') {
             <li>
                 <label>
                     Дата рождения:<br /><input name="birthdate" <?php if (isset($errors['birthdate']) && $errors['birthdate'] != '') {print 'class="error"';} ?> value="<?php print $values['birthdate']; ?>"
-                    type="date" required/>
+                    type="date"/ required>
                 </label><br />
             </li>
 
             <li>
-                <div <?php if (isset($errors['gender']) && $errors['gender'] != '') {print 'class="error"';} ?> >
-                    <label > <input name="gender" type="radio" value="female"
-                    <?php if (isset($values['gender']) && $values['gender'] == 'female') {echo 'checked';} ?> /> Женский</label>
+                <label>
+                <input name="gender" type="radio" value="female" <?php if (isset($errors['gender']) && $errors['gender'] != '') {print 'class="error"';} ?>
+                <?php if (isset($values['gender']) && $values['gender'] == 'female') {echo 'checked';}?>> Женский </label>
 
-                    <label> <input name="gender" type="radio" value="male"
-                    <?php if (isset($values['gender']) && $values['gender'] == 'male') {echo 'checked';} ?> /> Мужской</label><br />
-                </div>
+                <label> <input name="gender" type="radio" value="male" <?php if (isset($errors['gender']) && $errors['gender'] != '') {print 'class="error"';} ?>
+                <?php if (isset($values['gender']) && $values['gender'] == 'male') {echo 'checked';} ?>> Мужской</label><br />
+
             </li>
 
             <li>
