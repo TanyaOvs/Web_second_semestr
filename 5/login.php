@@ -4,17 +4,31 @@ header('Content-Type: text/html; charset=UTF-8');
 // В суперглобальном массиве $_SESSION хранятся переменные сессии.
 // Будем сохранять туда логин после успешной авторизации.
 $session_started = false;
-if (isset($_COOKIE[session_name()]) && $_COOKIE[session_name()] /*&& session_start()*/) {
-  $session_started = true;
+session_start();
+// Если есть логин в сессии, то пользователь уже авторизован.
+if (!empty($_SESSION['login'])) {
+    $session_started = true;
+    if(isset($_GET['logout'])) {
+      // Завершаем сессию
+      session_start();
+      session_unset();
+      session_destroy();
+      setcookie('login', '', time() - 3600);
+      setcookie('pass', '', time() - 3600);
 
-  // Если есть логин в сессии, то пользователь уже авторизован.
-  if (!empty($_SESSION['login'])) {
-    // TODO: Сделать выход (окончание сессии вызовом session_destroy(), при нажатии на кнопку Выход).
-    // Делаем перенаправление на форму.
-    header('Location: ./'); //ВОЗМОЖНО НАДО ПИСАТЬ FORM.PHP
-    exit();
-  }
+      // Перенаправляем пользователя на форму
+      header("Location: index.php");
+      exit();
 }
+else{
+    session_unset();
+    session_destroy();
+}
+
+header('Location: ./'); //ВОЗМОЖНО НАДО ПИСАТЬ FORM.PHP
+exit();
+}
+
 
 // В суперглобальном массиве $_SERVER PHP сохраняет некторые заголовки запроса HTTP
 // и другие сведения о клиненте и сервере, например метод текущего запроса $_SERVER['REQUEST_METHOD'].
@@ -38,7 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
 <?php
 }
-// Иначе, если запрос был методом POST, т.е. нужно сделать авторизацию с записью логина в сессию.
 else {
     $formPassword = $_POST['pass'];
     $formLogin = $_POST['login'];
@@ -46,17 +59,15 @@ else {
     $db = new PDO('mysql:host=localhost;dbname=u67310', $user, $pass);
     $dataBaseCheck = $db->prepare("SELECT Password FROM User_Login_Data where Login = ?");
     $dataBaseCheck->execute([$formLogin]);
-
-    $dataBasePassword = $dataBaseCheck->fetch(PDO::FETCH_ASSOC);
-    $hashedPassword = $dataBasePassword['Password'];
+    $hashedPassword = $dataBaseCheck->fetchColumn();
 
     if (!$dataBaseCheck) {
-        echo "<div class='errorLog'>Такой пользователь не существует!</div>";
-        exit();
+        echo "<div class='errorLog'>Такой пользователь не существует! Вернитесь на предыдущю страницу через <- и исправьте данные!</div>";
+        //exit("Такой пользователь не существует!");
     }
 
     // Проверяем, соответствует ли введенный пароль хэшированному паролю из базы данных
-    if (password_verify($formPassword, $hashedPassword)) {
+    if ($hashedPassword && password_verify($formPassword, $hashedPassword)) {
         // Если пароли соответствуют, то авторизуем пользователя
         if (!$session_started) {
             session_start();
@@ -66,7 +77,7 @@ else {
         header('Location: ./');
     } else {
         // Если пароли не совпадают, выводим сообщение об ошибке
-        echo "<div class='errorLog'>Неверный пароль!</div>";
-        exit();
+        print('<div class="errorLog">Неверный пароль! Вернитесь на предыдущю страницу через <- и исправьте данные!</div>');
+        //exit("Неверный пароль!");
     }
 }
