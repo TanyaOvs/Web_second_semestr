@@ -13,12 +13,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET'){
     // Массив сообщений  для пользователя
     $messages = array();
 
-    /*ВСТАВКА 1*/
     if (!empty($_COOKIE['save'])) {
        setcookie('save', '', $timeToDeleteCookie);
        setcookie('login', '', $timeToDeleteCookie);
        setcookie('password', '', $timeToDeleteCookie);
-
        // Если в куках есть пароль, то выводим сообщение.
        if (!empty($_COOKIE['password'])) {
          $messages[] = sprintf('Вы можете <a href="login.php">войти</a> с логином <strong>%s</strong>
@@ -115,14 +113,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET'){
     $values['languages'] = empty($_COOKIE['languages_values']) ? array() : explode(",", strip_tags($_COOKIE['languages_values']));
 
     /*ВСТАВКА 2*/
-    // Если нет предыдущих ошибок ввода, есть кука сессии, начали сессию и
-    // ранее в сессию записан факт успешного логина.
-    if (empty($errors) && !empty($_COOKIE[session_name()]) &&
-        session_start() && !empty($_SESSION['login'])) {
-      // TODO: загрузить данные пользователя из БД
+    // Если нет предыдущих ошибок ввода,начали сессию и в сессию записан факт успешного логина.
+    if (empty($errors) && session_start() && !empty($_SESSION['login'])) {
+      // TODO: загрузить данные пользователя из БД И заполнить переменную $values, предварительно санитизовав.
+        include('../db.php');
+        $db = new PDO('mysql:host=localhost;dbname=u67310', $user, $pass);
 
-      // TODO: заполнить переменную $values, предварительно санитизовав.
-      printf('Вход с логином %s, uid %d', $_SESSION['login'], $_SESSION['uid']);
+        $user_l_d = $db->prepare("SELECT UserID FROM User_Login_Data WHERE Login = ?");
+        $user_l_d->execute([$_SESSION['login']]);
+        $user_row = $user_l_d->fetch(PDO::FETCH_ASSOC);
+        $user_id = $user_row['UserID'];
+
+        $select = $db->prepare("SELECT (FIO, Phone, Email, Birthdate, Gender, Contract, Bio) FROM Applications WHERE ID = ?");
+        if($select->execute([$user_id])){
+            $app_row = $select->fetch(PDO::FETCH_ASSOC);
+            $values['fio'] = $app_row['FIO'];
+            $values['phone'] = $app_row['Phone'];
+            $values['email'] = $app_row['Email'];
+            $values['birthdate'] = $app_row['Birthdate'];
+            $values['gender'] = $app_row['Gender'];
+            $values['bio'] = $app_row['Bio'];
+            $values['check'] = $app_row['Contract'];
+            echo "<div class='error-messages'>$app_row</div>";
+        }
+        else {
+            echo "<div class='error-messages'>Ошибка при вставке данных в базу.</div>";
+        }
+
     }
 
     include('form.php');
@@ -227,13 +244,23 @@ else {
     }
 
     /*ВСТАВКА 3*/
-    if (!empty($_COOKIE[session_name()]) &&
-        session_start() && !empty($_SESSION['login'])) {
-        // TODO: перезаписать данные в БД новыми данными,
-        // кроме логина и пароля.
+    if (!empty($_COOKIE[session_name()]) && session_start() && !empty($_SESSION['login'])) {
+        $user_l_d = $db->prepare("SELECT UserID FROM User_Login_Data WHERE Login = ?");
+        $user_l_d->execute([$_SESSION['login']]);
+        $user_row = $user_l_d->fetch(PDO::FETCH_ASSOC);
+        $user_id = $user_row['UserID'];
+        $update = $db->prepare("UPDATE Applications SET FIO = ?, Phone = ?, Email = ?, Birthdate = ?, Gender = ?, Bio = ?, Contract = ? WHERE ID = ?");
+        if($update->execute([$name, $phone, $email, $birthdate, $gender, $bio, $check, $user_id])){
+            setcookie('save', '1');
+            header('Location: index.php?actionsCompleted=1');
+            exit();
+        }
+        else {
+            echo "<div class='error-messages'>Ошибка при вставке данных в базу.</div>";
+        }
+
     }
     else{
-        /*Вставка 4*/
         function generateRandomPassword($length) {
             $characters = '@!#*()/\%0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
             $charactersLength = strlen($characters);
@@ -275,7 +302,7 @@ else {
         exit();
         }
         else {
-            echo "<div class='error-message' style='color: red;'>Ошибка при вставке данных в базу.</div>";
+            echo "<div class='error-messages'>Ошибка при вставке данных в базу.</div>";
         }
     }
 }
