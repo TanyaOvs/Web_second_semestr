@@ -25,7 +25,7 @@ else{
     session_destroy();
 }
 
-header('Location: ./'); //ВОЗМОЖНО НАДО ПИСАТЬ FORM.PHP
+header('Location: ./');
 exit();
 }
 
