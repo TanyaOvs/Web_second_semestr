@@ -64,3 +64,47 @@ body h2{
 .error{
     outline: 2px solid red;
 }
+
+.logout-button {
+    margin: 10px 0px;
+    font: small-caps 1.2rem sans-serif;
+    font-size: 20px;
+    padding: 10px 20px;
+    text-align: center;
+    color: #FDE8FD;
+    background-color: #68006C;
+    border-radius: 5px;
+}
+
+.logout-button:hover {
+    background-color: #a427a8;
+}
+
+.login_form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px auto;
+    max-width: 400px;
+    padding: 20px;
+    border: 10px groove #68006C;
+    background: #FDE8FD;
+    font: small-caps bold 1.2rem sans-serif;
+    font-size: 18px;
+}
+
+
+.login-button {
+    margin-left: 100px;
+    font: small-caps 1.2rem sans-serif;
+    font-size: 20px;
+    padding: 10px 20px;
+    text-align: center;
+    color: #FDE8FD;
+    background-color: #68006C;
+    border-radius: 5px;
+}
+
+.login-button:hover {
+    background-color: #a427a8;
+}
