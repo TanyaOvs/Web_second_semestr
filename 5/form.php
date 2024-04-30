@@ -28,14 +28,19 @@ if (!empty($messages)) {
 }
 if(isset($_GET['actionsCompleted']) && $_GET['actionsCompleted'] == '1') {
     echo "<div class='error-messages'>Форма успешно отправлена!</div>";
+    //$errorsExist = FALSE; Для очистки значений в форме, после успешной отправки
 }
-session_start();
+
+//session_start();
 if(isset($_SESSION['login'])) {
-    echo "Вы авторизованы под логином " . $_SESSION['login'];
+    echo "<div class='form'>";
+    $log = 'Вы авторизованы под логином: ' . $_SESSION['login'];
+    echo "<div class='error-messages'>$log</div>";
     echo "<form action='login.php' method='get'>";
     echo "<button type='submit' name='logout' value='1' class='logout-button'>Выйти</button>";
     echo "</form>";
-    $errorsExist = TRUE;
+    echo "</div>";
+    // $errorsExist = TRUE; Для очистки значений в форме, после успешной отправки
 }
 ?>
 
@@ -45,28 +50,28 @@ if(isset($_SESSION['login'])) {
         <ol>
             <li>
                 <label>
-                    ФИО:<br /> <input name="fio" <?php if (isset($errors['fio']) && $errors['fio'] != '') {print 'class="error"';} ?> value="<?php if(isset($values['fio']) && $errorsExist) {print $values['fio'];} ?>"
+                    ФИО:<br /> <input name="fio" <?php if (isset($errors['fio']) && $errors['fio'] != '') {print 'class="error"';} ?> value="<?php if(isset($values['fio'])) {print $values['fio'];} ?>"
                     type="text" placeholder="Иванов Иван Иванович" />
                 </label><br />
             </li>
 
             <li>
                 <label>
-                    Телефон:<br /><input name="phone" <?php if (isset($errors['phone']) && $errors['phone'] != '') {print 'class="error"';} ?> value="<?php if(isset($values['phone'])&& $errorsExist) {print $values['phone'];} ?>"
+                    Телефон:<br /><input name="phone" <?php if (isset($errors['phone']) && $errors['phone'] != '') {print 'class="error"';} ?> value="<?php if(isset($values['phone'])) {print $values['phone'];} ?>"
                     type="tel" placeholder="Введите номер телефона" />
                 </label><br />
             </li>
 
             <li>
                 <label>
-                    E-mail:<br /><input name="email" <?php if (isset($errors['email']) && $errors['email'] != '') {print 'class="error"';} ?> value="<?php if(isset($values['email']) && $errorsExist) {print $values['email'];} ?>"
+                    E-mail:<br /><input name="email" <?php if (isset($errors['email']) && $errors['email'] != '') {print 'class="error"';} ?> value="<?php if(isset($values['email'])) {print $values['email'];} ?>"
                     type="email" placeholder="Введите вашу почту" />
                 </label><br />
             </li>
 
             <li>
                 <label>
-                    Дата рождения:<br /><input name="birthdate" <?php if (isset($errors['birthdate']) && $errors['birthdate'] != '') {print 'class="error"';} ?> value="<?php if($errorsExist) {print $values['birthdate'];} ?>"
+                    Дата рождения:<br /><input name="birthdate" <?php if (isset($errors['birthdate']) && $errors['birthdate'] != '') {print 'class="error"';} ?> value="<?php print $values['birthdate']; ?>"
                     type="date"/ required>
                 </label><br />
             </li>
@@ -74,10 +79,10 @@ if(isset($_SESSION['login'])) {
             <li>
                 <label>
                 <input name="gender" type="radio" value="female" <?php if (isset($errors['gender']) && $errors['gender'] != '') {print 'class="error"';} ?>
-                <?php if (isset($values['gender']) && $values['gender'] == 'female' && $errorsExist) {echo 'checked';}?>> Женский </label>
+                <?php if (isset($values['gender']) && $values['gender'] == 'female') {echo 'checked';}?>> Женский </label>
 
                 <label> <input name="gender" type="radio" value="male" <?php if (isset($errors['gender']) && $errors['gender'] != '') {print 'class="error"';} ?>
-                <?php if (isset($values['gender']) && $values['gender'] == 'male' && $errorsExist) {echo 'checked';} ?>> Мужской</label><br />
+                <?php if (isset($values['gender']) && $values['gender'] == 'male') {echo 'checked';} ?>> Мужской</label><br />
 
             </li>
 
@@ -87,7 +92,7 @@ if(isset($_SESSION['login'])) {
                     <select name="language[]" multiple="multiple" <?php if ($errors['language_n'] == '1' || $errors['language_d'] == '1') {print 'class="error"';} ?>>
                     <?php
                     foreach ($valid_languages as $language) {
-                      $selected = in_array($language, $values['languages']) && $errorsExist ? 'selected' : '';
+                      $selected = in_array($language, $values['languages']) ? 'selected' : '';
                       printf('<option value="%s" %s>%s</option>', $language, $selected, $language);
                     } ?>
                     </select>
@@ -97,13 +102,13 @@ if(isset($_SESSION['login'])) {
             <li>
                 <label>
                     Биография: <br /><textarea name="bio" <?php if (isset($errors['bio']) && $errors['bio'] != '') {print 'class="error"';} ?>
-                    placeholder="Напишите о себе"> <?php if(isset($values['bio'])&& $errorsExist) {print $values['bio'];} ?> </textarea>
+                    placeholder="Напишите о себе"> <?php if(isset($values['bio'])) {print $values['bio'];} ?> </textarea>
                 </label> <br />
             </li>
 
             <li>
                 Соглашение: <br />
-                <label <?php if (isset($errors['check']) && $errors['check'] != '') {print 'class="error"';} ?> ><input type="checkbox" name="check" <?php if (isset($values['check']) && $values['check'] == 1 && $errorsExist) {echo 'checked';} ?>
+                <label <?php if (isset($errors['check']) && $errors['check'] != '') {print 'class="error"';} ?> ><input type="checkbox" name="check" <?php if (isset($values['check']) && $values['check'] == 1) {echo 'checked';} ?>
                 /> C контрактом ознакомлен(а)</label><br /> <!-- $errorsExist && $errors['check'] == '' -->
             </li>
 
