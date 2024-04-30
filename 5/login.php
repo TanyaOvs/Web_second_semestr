@@ -15,9 +15,11 @@ if (!empty($_SESSION['login'])) {
       session_destroy();
       setcookie('login', '', time() - 3600);
       setcookie('pass', '', time() - 3600);
+      setcookie('mySession', '', time() - 3600);
 
       // Перенаправляем пользователя на форму
-      header("Location: index.php");
+      header('Location: ./');
+      //header("Location: index.php");
       exit();
 }
 else{
@@ -41,12 +43,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <title>Авторизация</title>
 </head>
-<div class="form">
+<div class="login_form">
     <div class="errorLog"></div>
-    <form action="" method="post">
-      <input name="login" />
-      <input name="pass" />
-      <input type="submit" value="Войти" />
+    <h2>Авторизация</h2>
+    <form action="" method="post"> <br />
+      Логин: <input name="login" /> <br /> <br />
+      Пароль: <input name="pass" /> <br /> <br />
+      <button type='submit' class='login-button'>Войти</button>
     </form>
 </div>
 
@@ -72,12 +75,14 @@ else {
         if (!$session_started) {
             session_start();
         }
+        echo "<div class='error-messages'>Записываем в сессию логин</div>";
         $_SESSION['login'] = $_POST['login'];
         $_SESSION['uid'] = 123;
+        setcookie('mySession', 'sessionStarted', time() + 360 * 24 * 60 * 60);
         header('Location: ./');
     } else {
         // Если пароли не совпадают, выводим сообщение об ошибке
-        print('<div class="errorLog">Неверный пароль! Вернитесь на предыдущю страницу через <- и исправьте данные!</div>');
+        print('<div class="errorLog">Неверный пароль! Вернитесь на предыдущую страницу через <- и исправьте данные!</div>');
         //exit("Неверный пароль!");
     }
 }
