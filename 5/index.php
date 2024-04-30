@@ -113,11 +113,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET'){
     $values['check'] = empty($_COOKIE['check_value']) ? '' : strip_tags($_COOKIE['check_value']);
     $values['languages'] = empty($_COOKIE['languages_values']) ? array() : explode(",", strip_tags($_COOKIE['languages_values']));
 
-    /*ВСТАВКА 2*/
     // Если нет предыдущих ошибок ввода,начали сессию и в сессию записан факт успешного логина.
     session_start();
     if (!empty($_COOKIE['mySession']) && isset($_SESSION['login']) && empty($error)) {
-      // TODO: загрузить данные пользователя из БД И заполнить переменную $values
         //session_start();
         include('../db.php');
         $db = new PDO('mysql:host=localhost;dbname=u67310', $user, $pass);
@@ -273,7 +271,6 @@ else {
         setcookie('check_error', '', $timeToDeleteCookie);
     }
 
-    /*ВСТАВКА 3*/
     if (!empty($_COOKIE[session_name()]) && session_start() && !empty($_SESSION['login'])) {
         $user_l_d = $db->prepare("SELECT UserID FROM User_Login_Data WHERE Login = ?");
         $user_l_d->execute([$_SESSION['login']]);
@@ -281,7 +278,7 @@ else {
         $user_id = $user_row['UserID'];
         $update = $db->prepare("UPDATE Applications SET FIO = ?, Phone = ?, Email = ?, Birthdate = ?, Gender = ?, Bio = ?, Contract = ? WHERE ID = ?");
         if($update->execute([$name, $phone, $email, $birthdate, $gender, $bio, $check, $user_id])){
-            //TODO: Обновление языков программирования - удалить имеющиеся языки и записать новые
+            //Обновление языков программирования
             $delete_langs = $db->prepare("DELETE FROM Application_Ability WHERE ApplicationID = ?");
             $delete_langs->execute([$user_id]);
 
