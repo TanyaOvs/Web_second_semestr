@@ -38,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET'){
     $errors['language_n'] = !empty($_COOKIE['language_null_error']); // Язык не выбран
     $errors['language_d'] = !empty($_COOKIE['language_data_error']); // Некорректные данные для языка
 
+    $error = '';
     //Выдаем сообщения об ошибках для каждого поля
      if ($errors['fio']) {
          setcookie('fio_error', '', $timeToDeleteCookie ); // Удаляем куку, указывая время устаревания в прошлом.
@@ -114,8 +115,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET'){
 
     /*ВСТАВКА 2*/
     // Если нет предыдущих ошибок ввода,начали сессию и в сессию записан факт успешного логина.
-    if (empty($errors) && session_start() && !empty($_SESSION['login'])) {
-      // TODO: загрузить данные пользователя из БД И заполнить переменную $values, предварительно санитизовав.
+    session_start();
+    if (!empty($_COOKIE['mySession']) && isset($_SESSION['login']) && empty($error)) {
+      // TODO: загрузить данные пользователя из БД И заполнить переменную $values
+        //session_start();
         include('../db.php');
         $db = new PDO('mysql:host=localhost;dbname=u67310', $user, $pass);
 
@@ -124,17 +127,44 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET'){
         $user_row = $user_l_d->fetch(PDO::FETCH_ASSOC);
         $user_id = $user_row['UserID'];
 
-        $select = $db->prepare("SELECT (FIO, Phone, Email, Birthdate, Gender, Contract, Bio) FROM Applications WHERE ID = ?");
+        $select = $db->prepare("SELECT FIO, Phone, Email, Birthdate, Gender, Contract, Bio FROM Applications WHERE ID = ?");
         if($select->execute([$user_id])){
             $app_row = $select->fetch(PDO::FETCH_ASSOC);
-            $values['fio'] = $app_row['FIO'];
-            $values['phone'] = $app_row['Phone'];
-            $values['email'] = $app_row['Email'];
-            $values['birthdate'] = $app_row['Birthdate'];
-            $values['gender'] = $app_row['Gender'];
-            $values['bio'] = $app_row['Bio'];
-            $values['check'] = $app_row['Contract'];
-            echo "<div class='error-messages'>$app_row</div>";
+            //$values['fio'] = $app_row['FIO'];
+            $values['fio'] = empty($app_row['FIO']) ? '' : strip_tags($app_row['FIO']);
+            $values['phone'] = empty($app_row['Phone']) ? '' : strip_tags($app_row['Phone']);
+            $values['email'] = empty($app_row['Email']) ? '' : strip_tags($app_row['Email']);
+            $values['birthdate'] = empty($app_row['Birthdate']) ? '' : strip_tags($app_row['Birthdate']);
+            $values['gender'] = empty($app_row['Gender']) ? '' : strip_tags($app_row['Gender']);
+            $values['bio'] = empty($app_row['Bio']) ? '' : strip_tags($app_row['Bio']);
+            $values['check'] = empty($app_row['Contract']) ? '' : strip_tags($app_row['Contract']);
+
+            //Извлечение языков программирования из базы данных
+            $db_lang_id = $db->prepare("SELECT ProgrammingLanguageID FROM Application_Ability WHERE ApplicationID = ?");
+            $db_lang_id ->execute([$user_id]);
+            $lang_id_column = $db_lang_id->fetchAll(PDO::FETCH_ASSOC);
+
+            // Создаем массив для хранения индексов языков программирования
+            $lang_ids = array();
+
+            // Перебираем каждую строку результата запроса и добавляем значение столбца ProgrammingLanguageID в массив $lang_ids
+            foreach ($lang_id_column as $col) {
+                $lang_ids[] = $col['ProgrammingLanguageID'];
+            }
+
+            $db_langs = '';
+            foreach ($lang_ids as $l_id){
+                $user_lang = $db->prepare("SELECT ProgrammingLanguage FROM Programming_Languages WHERE ID = ?");
+                $user_lang ->execute([$l_id]);
+                $p_lang = $user_lang->fetch(PDO::FETCH_ASSOC);
+
+                if (!empty($db_langs)) {
+                    $db_langs .= ',';
+                }
+                $db_langs .= $p_lang['ProgrammingLanguage'];
+            }
+            $values['languages'] = explode(",", strip_tags($db_langs));
+
         }
         else {
             echo "<div class='error-messages'>Ошибка при вставке данных в базу.</div>";
@@ -251,6 +281,19 @@ else {
         $user_id = $user_row['UserID'];
         $update = $db->prepare("UPDATE Applications SET FIO = ?, Phone = ?, Email = ?, Birthdate = ?, Gender = ?, Bio = ?, Contract = ? WHERE ID = ?");
         if($update->execute([$name, $phone, $email, $birthdate, $gender, $bio, $check, $user_id])){
+            //TODO: Обновление языков программирования - удалить имеющиеся языки и записать новые
+            $delete_langs = $db->prepare("DELETE FROM Application_Ability WHERE ApplicationID = ?");
+            $delete_langs->execute([$user_id]);
+
+            $update_langs = $db->prepare("SELECT ID FROM Programming_Languages WHERE ProgrammingLanguage = ?");
+            $stmt = $db->prepare("INSERT INTO Application_Ability (ApplicationID, ProgrammingLanguageID) VALUES (?, ?)");
+
+            foreach ($languages as $language) {
+                $update_langs->execute([$language]);
+                $programming_language_id = $update_langs->fetchColumn();
+                $stmt->execute([$user_id, $programming_language_id]);
+            }
+
             setcookie('save', '1');
             header('Location: index.php?actionsCompleted=1');
             exit();
