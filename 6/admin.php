@@ -1,7 +1,5 @@
 <?php
 // Подключение к базе данных
-//$hashed_password = password_hash('123', PASSWORD_DEFAULT);
-//echo $hashed_password;
 include('../db.php');
 $db = new PDO('mysql:host=localhost;dbname=u67310', $user, $pass);
 
