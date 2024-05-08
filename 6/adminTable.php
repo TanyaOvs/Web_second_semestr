@@ -23,6 +23,31 @@ $db = new PDO('mysql:host=localhost;dbname=u67310', $user, $pass);
     </div>
 </div>
 
+<!-- Статистика -->
+<h1 class="colH">Статистика пользователей, любящих каждый язык программирования:</h1>
+<div class="statDiv">
+    <table class="adminTab">
+        <tr>
+            <th>Язык программирования</th>
+            <th>Количество любителей</th>
+            <?php
+            $statistics = $db->query("SELECT pr.ProgrammingLanguage, count(appAb.ApplicationID) as Count 
+                                      FROM Application_Ability appAb 
+                                      LEFT JOIN Programming_Languages pr ON (appAb.ProgrammingLanguageID = pr.ID) 
+                                      GROUP BY appAb.ProgrammingLanguageID");
+
+            while ($cur_lan = $statistics->fetch(PDO::FETCH_ASSOC)) {
+                echo "<tr>";
+                echo "<td>{$cur_lan['ProgrammingLanguage']}</td>";
+                echo "<td>{$cur_lan['Count']}</td>";
+                echo "</tr>";
+            }
+            ?>
+        </tr>
+    </table>
+    <img src="cat.jpg" alt="Котик лежит">
+</div>
+
 <!-- Админ-панель -->
 <div class="adminTableDiv">
     <table class="adminTab">
