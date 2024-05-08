@@ -151,3 +151,22 @@ tr:nth-child(even) {
 .change-button:hover {
     background-color: #d443da;
 }
+
+
+.statDiv{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+}
+
+.statDiv img{
+    margin-right: 170px;
+}
+
+.colH{
+    color:#68006C;
+    text-align: center;
+}
